@@ -1,0 +1,41 @@
+{
+  "name": "factorio-flow-planner",
+  "version": "0.14.0",
+  "description": "Node-graph production planner for Factorio 2.0 and Space Age",
+  "main": "src/main.js",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "test:import": "node scripts/test-import.js",
+    "dist": "electron-builder --win nsis"
+  },
+  "build": {
+    "appId": "local.factorio-flow-planner",
+    "productName": "Factorio Flow Planner",
+    "files": [
+      "src/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": "nsis"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true
+    }
+  },
+  "dependencies": {
+    "@fontsource/ibm-plex-mono": "^5.3.0",
+    "@fontsource/titillium-web": "^5.3.0"
+  },
+  "devDependencies": {
+    "electron": "^44.7.0",
+    "electron-builder": "^26.15.3"
+  },
+  "githubRepo": "folkeoberg/factorio-flow-planner",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/folkeoberg/factorio-flow-planner.git"
+  }
+}

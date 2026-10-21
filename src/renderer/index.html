@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' ffp: data:; style-src 'self' 'unsafe-inline'; font-src 'self'; script-src 'self'">
+<title>Factorio Flow Planner</title>
+<link rel="stylesheet" href="../../node_modules/@fontsource/titillium-web/400.css">
+<link rel="stylesheet" href="../../node_modules/@fontsource/titillium-web/600.css">
+<link rel="stylesheet" href="../../node_modules/@fontsource/titillium-web/700.css">
+<link rel="stylesheet" href="../../node_modules/@fontsource/ibm-plex-mono/400.css">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="bar">
+  <span class="brand">Flow Planner</span>
+  <input id="fname" aria-label="Factory name" spellcheck="false">
+  <div class="planets" id="planets" role="group" aria-label="Planet"></div>
+  <button class="btn primary" id="bPlan" title="Ctrl+P">Plan production…</button>
+  <button class="btn" id="bAdd" title="Space or double-click the canvas">Add node</button>
+  <button class="btn tog" id="bAuto" aria-pressed="true" title="Resize machines and supplies automatically whenever the factory changes">Auto-balance</button>
+  <button class="btn" id="bArrange" title="Lay the factory out neatly (Ctrl+L)">Arrange</button>
+  <button class="btn" id="bFit" title="Ctrl+0">Fit view</button>
+  <div class="seg" role="group" aria-label="Rate unit"><button data-u="s">/s</button><button data-u="min">/min</button><button data-u="h">/h</button></div>
+  <span class="spacer"></span>
+  <button class="btn" id="bOutposts" title="Show or hide the outposts list">Outposts</button>
+  <button class="btn" id="bSettings">Settings</button>
+  <button class="btn" id="bSide">Summary</button>
+</div>
+<div class="main">
+  <aside id="opanel"><div class="ophead"><h3 id="ophead-title">Outposts</h3><button class="mini" id="opAdd" title="Add an empty outpost on this planet">+ New</button></div><div id="oplist"></div><div id="opothers"></div><div class="note ophint">Each outpost is a group on the canvas with its own planet. Click to go there, double-click to rename.</div></aside>
+  <div id="canvas">
+    <div id="world"><div id="frames"></div><svg id="edges"></svg><div id="labels"></div><div id="nodes"></div></div>
+    <div class="hint">Drag a port to connect · right-drag to select · double-click or Space to add · scroll to zoom</div>
+    <div class="empty-canvas" id="emptyCanvas" hidden>
+      <h2>Start a factory</h2>
+      <p>Plan production builds a full chain for any item. You can also add nodes one at a time and wire them together.</p>
+      <div class="row-btns"><button class="btn primary" id="eaPlan">Plan production…</button><button class="btn" id="eaAdd">Add node</button></div>
+    </div>
+  </div>
+  <aside id="side"></aside>
+</div>
+<div id="modal"></div>
+<div id="welcome" hidden></div>
+<div id="update" role="status" aria-live="polite" hidden></div>
+<div id="toast" role="status" aria-live="polite"></div>
+<script src="lp.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
