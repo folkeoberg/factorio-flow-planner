@@ -9,7 +9,9 @@ A desktop production planner for Factorio 2.0 and Space Age, in the style of Sat
 3. Start **Factorio Flow Planner** from the desktop or Start menu.
 4. On first start, close Factorio if it's running and click **Import game data**. The planner reads recipes, buildings, planets and icons from your own Factorio install, so it always matches your game version and mods. It runs Factorio briefly in the background; a window may appear for up to a minute.
 
-You need **Factorio 2.0** installed (Steam or standalone). Space Age is optional; with it enabled, all planets are available.
+You need **Factorio 2.0** installed (Steam or standalone) for the import. Space Age is optional; with it enabled, all planets are available.
+
+**No Factorio on this PC?** Someone who has it can use **Game data → Export game data** in their planner and send you the `.ffpdata` file. On the first-run screen, click **Use a game data file…** and pick it. Everything then works without the game.
 
 Updates install themselves: when a new version is released, the planner shows **"Version x is ready"**. Click **Restart and update**.
 

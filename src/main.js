@@ -79,6 +79,8 @@ function buildMenu() {
     ] },
     { label: 'Game data', submenu: [
       { label: 'Import from Factorio…', click: () => send('import') },
+      { label: 'Import game data file…', click: () => send('importPack') },
+      { label: 'Export game data (to share)…', click: () => send('exportPack') },
       { label: 'Unlocked buildings…', click: () => send('buildings') },
       { label: 'Settings…', accelerator: 'CmdOrCtrl+,', click: () => send('settings') },
       { label: 'Open data folder', click: () => shell.openPath(app.getPath('userData')) },
@@ -208,6 +210,28 @@ ipcMain.handle('gamedata:importDump', async () => {
     const dirs = exe ? [path.join(gamedata.installDirOf(exe), 'data'), path.join(process.env.APPDATA || '', 'Factorio', 'mods')] : [];
     const model = await gamedata.importFromDump(r.filePaths[0], dirs, dataDir(), progress);
     return { ok: true, model };
+  } catch (err) {
+    return { ok: false, error: err.message };
+  }
+});
+
+ipcMain.handle('gamedata:exportPack', async () => {
+  if (!fs.existsSync(path.join(dataDir(), 'gamedata.json'))) return { ok: false, error: 'Import game data from Factorio first.' };
+  const r = await dialog.showSaveDialog(win, { title: 'Export game data', defaultPath: path.join(savesDir(), 'Factorio game data.ffpdata'), filters: [{ name: 'Factorio Flow Planner game data', extensions: ['ffpdata'] }] });
+  if (r.canceled || !r.filePath) return { ok: false, canceled: true };
+  try {
+    const res = gamedata.exportPack(dataDir(), r.filePath);
+    shell.showItemInFolder(r.filePath);
+    return { ok: true, path: r.filePath, ...res };
+  } catch (err) {
+    return { ok: false, error: err.message };
+  }
+});
+ipcMain.handle('gamedata:importPack', async () => {
+  const r = await dialog.showOpenDialog(win, { title: 'Choose a game data file', properties: ['openFile'], filters: [{ name: 'Factorio Flow Planner game data', extensions: ['ffpdata'] }] });
+  if (r.canceled || !r.filePaths[0]) return { ok: false, canceled: true };
+  try {
+    return { ok: true, model: gamedata.importPack(r.filePaths[0], dataDir()) };
   } catch (err) {
     return { ok: false, error: err.message };
   }

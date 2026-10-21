@@ -2,6 +2,7 @@
 const fs = require('fs');
 const path = require('path');
 const { spawn } = require('child_process');
+const zlib = require('zlib');
 
 const MODEL_VERSION = 1;
 const STEAM_APP_ID = '427520';
@@ -377,4 +378,46 @@ function loadModel(outDir) {
   }
 }
 
-module.exports = { detectFactorio, importFromFactorio, importFromDump, loadModel, buildModel, readLocale, installDirOf };
+/* ---------- Game data files (for people without Factorio) ----------
+   One gzip-compressed file holding the imported model and every icon, so someone with Factorio can export it
+   and someone without can import it. */
+const PACK_FORMAT = 'ffp-gamedata';
+function exportPack(dataDir, file) {
+  const model = JSON.parse(fs.readFileSync(path.join(dataDir, 'gamedata.json'), 'utf8'));
+  const icons = {};
+  const walk = (dir, rel) => {
+    if (!fs.existsSync(dir)) return;
+    for (const f of fs.readdirSync(dir)) {
+      const p = path.join(dir, f), r = rel ? rel + '/' + f : f;
+      if (fs.statSync(p).isDirectory()) walk(p, r);
+      else if (f.endsWith('.png')) icons[r] = fs.readFileSync(p).toString('base64');
+    }
+  };
+  walk(path.join(dataDir, 'icons'), '');
+  const buf = zlib.gzipSync(Buffer.from(JSON.stringify({ format: PACK_FORMAT, version: 1, model, icons })), { level: 9 });
+  fs.mkdirSync(path.dirname(file), { recursive: true });
+  fs.writeFileSync(file, buf);
+  return { icons: Object.keys(icons).length, bytes: buf.length };
+}
+function importPack(file, outDir) {
+  let data;
+  try { data = JSON.parse(zlib.gunzipSync(fs.readFileSync(file)).toString('utf8')); } catch { throw new Error('That file is not a Factorio Flow Planner game data file.'); }
+  if (data.format !== PACK_FORMAT || !data.model || !data.model.recipes) throw new Error('That file is not a Factorio Flow Planner game data file.');
+  if (data.model.version !== MODEL_VERSION) throw new Error('That game data file was made by a different version of the planner. Ask for a new export.');
+  const tmp = outDir + '.new';
+  fs.rmSync(tmp, { recursive: true, force: true });
+  fs.mkdirSync(path.join(tmp, 'icons'), { recursive: true });
+  for (const [rel, b64] of Object.entries(data.icons || {})) {
+    // Only plain "folder/name.png" paths, so a file can never write outside the icons folder.
+    if (!/^\w[\w.-]*\/\w[\w.-]*\.png$/.test(rel)) continue;
+    const dest = path.join(tmp, 'icons', rel);
+    fs.mkdirSync(path.dirname(dest), { recursive: true });
+    fs.writeFileSync(dest, Buffer.from(b64, 'base64'));
+  }
+  fs.writeFileSync(path.join(tmp, 'gamedata.json'), JSON.stringify(data.model));
+  fs.rmSync(outDir, { recursive: true, force: true });
+  fs.renameSync(tmp, outDir);
+  return data.model;
+}
+
+module.exports = { exportPack, importPack, detectFactorio, importFromFactorio, importFromDump, loadModel, buildModel, readLocale, installDirOf };

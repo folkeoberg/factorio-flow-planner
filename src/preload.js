@@ -6,6 +6,8 @@ contextBridge.exposeInMainWorld('ffp', {
   browseFactorio: () => ipcRenderer.invoke('factorio:browse'),
   importGameData: (exe) => ipcRenderer.invoke('gamedata:import', exe),
   importDumpFile: () => ipcRenderer.invoke('gamedata:importDump'),
+  exportGamePack: () => ipcRenderer.invoke('gamedata:exportPack'),
+  importGamePack: () => ipcRenderer.invoke('gamedata:importPack'),
   onImportProgress: (cb) => ipcRenderer.on('import:progress', (_e, m) => cb(m)),
   saveFile: (json, saveAs, name) => ipcRenderer.invoke('file:save', json, saveAs, name),
   showFile: () => ipcRenderer.send('file:show'),

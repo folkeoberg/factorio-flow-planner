@@ -2329,11 +2329,16 @@ async function showImport(cancelable) {
         <button class="btn" id="wDump" ${busy ? 'disabled' : ''}>Use a data-raw-dump.json…</button>
         ${cancelable && !busy ? '<button class="btn" id="wCancel" style="margin-left:auto">Cancel</button>' : ''}
       </div>
+      <div class="wpack ${exe ? '' : 'first'}">
+        <div><b>No Factorio on this PC?</b> Someone who has it can use <b>Game data → Export game data</b> in their planner and send you the file. Open that file here and everything works without the game.</div>
+        <button class="btn ${exe ? '' : 'primary'}" id="wPack" ${busy ? 'disabled' : ''}>Use a game data file…</button>
+      </div>
       <div class="log" id="wLog" ${busy || w.dataset.log ? '' : 'hidden'}>${w.dataset.log || ''}</div>
     </div>`;
     $('#wImport').onclick = () => run(() => window.ffp.importGameData(exe));
     $('#wBrowse').onclick = async () => { const p = await window.ffp.browseFactorio(); if (p) { exe = p; draw(); } };
     $('#wDump').onclick = () => run(() => window.ffp.importDumpFile());
+    $('#wPack').onclick = () => run(() => window.ffp.importGamePack());
     if ($('#wCancel')) $('#wCancel').onclick = () => { w.hidden = true; };
   };
   const log = (m, cls = '') => { w.dataset.log = (w.dataset.log || '') + `<div class="${cls}">${esc(m)}</div>`; const l = $('#wLog'); if (l) { l.hidden = false; l.innerHTML = w.dataset.log; l.scrollTop = 1e9; } };
@@ -2422,7 +2427,7 @@ function loadState(obj) {
   ensureOutposts();
 }
 window.ffp.onMenu(async (cmd) => {
-  if (!G && cmd !== 'import') return;
+  if (!G && cmd !== 'import' && cmd !== 'importPack') return;
   const typing = document.activeElement && document.activeElement.closest('input,textarea');
   switch (cmd) {
     case 'new': S = blankState(); ensureOutposts(); selected.clear(); window.ffp.newFile(); syncToolbar(); rebuild(); commit(); window.ffp.setDirty(false); break;
@@ -2445,6 +2450,16 @@ window.ffp.onMenu(async (cmd) => {
     case 'fit': fitView(); break;
     case 'arrange': arrange(); commit(); fitView(); break;
     case 'import': closeModal(); showImport(!!G); break;
+    case 'importPack': {
+      const r = await window.ffp.importGamePack();
+      if (r.ok) { $('#welcome').hidden = true; startWith(r.model); toast('Game data loaded'); } else if (!r.canceled) toast(r.error);
+      break;
+    }
+    case 'exportPack': {
+      const r = await window.ffp.exportGamePack();
+      if (r.ok) toast(`Saved game data (${(r.bytes / 1048576).toFixed(1)} MB). Send that file to whoever needs it.`); else if (!r.canceled) toast(r.error);
+      break;
+    }
     case 'settings': openSettings(); break;
     case 'buildings': openBuildings(); break;
   }

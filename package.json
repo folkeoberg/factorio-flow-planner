@@ -1,6 +1,6 @@
 {
   "name": "factorio-flow-planner",
-  "version": "0.14.0",
+  "version": "0.15.0",
   "description": "Node-graph production planner for Factorio 2.0 and Space Age",
   "main": "src/main.js",
   "private": true,

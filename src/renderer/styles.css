@@ -376,3 +376,8 @@ label.unlock:has(input:not(:checked)) { opacity: .5; }
 .opplanet { display: flex; align-items: center; gap: 6px; background: none; border: 1px solid transparent; border-radius: 3px; padding: 3px 6px; text-align: left; font-size: 13px; }
 .opplanet:hover { border-color: var(--line); background: var(--panel); }
 .opplanet b { margin-left: auto; color: var(--accent); }
+
+.wpack { display: flex; gap: 14px; align-items: center; padding: 12px; border: 1px dashed var(--line); border-radius: 5px; font-size: 13px; color: var(--muted); }
+.wpack b { color: var(--fg); }
+.wpack.first { border-style: solid; border-color: var(--accent); }
+.wpack .btn { flex: none; }
